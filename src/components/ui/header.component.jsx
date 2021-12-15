@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "@mui/system";
 import { Link } from "react-router-dom";
 
@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 
 import logo from "../../assets/logo.svg";
-import { ReactComponent as Logo } from "../../assets/logo.svg";
 
 // theme
 import theme from "./theme";
@@ -26,7 +25,16 @@ const headerStyles = {
     marginBottom: "3em",
   },
   logo: {
-    height: "7em",
+    height: "8em",
+    [theme.breakpoints.down("md")]: {
+      height: "7em",
+    },
+  },
+  logoContainer: {
+    padding: 0,
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
   },
   tabContainer: {
     marginLeft: "auto",
@@ -41,11 +49,13 @@ const headerStyles = {
   },
 };
 
-const StyledTab = styled(Tab)(({ theme }) => ({
-  ...theme.typography.tab,
-  minWidth: 10,
-  marginLeft: "25px",
-}));
+const StyledTab = styled((props) => <Tab component={Link} {...props} />)(
+  ({ theme }) => ({
+    ...theme.typography.tab,
+    minWidth: 10,
+    marginLeft: "25px",
+  })
+);
 
 // functions
 function ElevationScroll(props) {
@@ -64,24 +74,71 @@ function ElevationScroll(props) {
 const Header = () => {
   const [value, setValue] = useState(0);
 
+  const handleChange = (e, value) => {
+    setValue(value);
+  };
+
+  useEffect(() => {
+    console.log(value);
+    console.log(window.location.pathname);
+    switch (window.location.pathname) {
+      case "/":
+        if (value !== 0) setValue(0);
+        break;
+      case "/services":
+        if (value !== 1) setValue(1);
+        break;
+      case "/revolution":
+        if (value !== 2) setValue(2);
+        break;
+      case "/about":
+        if (value !== 3) setValue(3);
+        break;
+      case "/contact":
+        if (value !== 4) setValue(4);
+        break;
+      case "/estimate":
+        if (value !== 5) setValue(5);
+        break;
+      default:
+        break;
+    }
+  }, [value]); // only run if value is updated
+
   return (
     <>
       <ElevationScroll>
         {/* Default position of "fixed" */}
         <AppBar position="fixed">
           <Toolbar disableGutters>
-            {/* <Logo sx={headerStyles.logo} /> */}
-            <Tabs sx={{ ...headerStyles.tabContainer }} value={value}>
-              <StyledTab label="Home" />
-              <StyledTab label="Services" />
-              <StyledTab label="The Revolution" />
-              <StyledTab label="About Us" />
-              <StyledTab label="Contact Us" />
+            <Button
+              sx={headerStyles.logoContainer}
+              disableRipple
+              component={Link}
+              to="/"
+              onClick={() => setValue(0)}
+            >
+              <img sx={headerStyles.logo} alt="company logo" src={logo} />
+            </Button>
+
+            <Tabs
+              sx={{ ...headerStyles.tabContainer }}
+              onChange={handleChange}
+              value={value}
+            >
+              {/* <StyledTab label="Home" /> */}
+              <StyledTab label="Home" to="/" />
+              <StyledTab label="Services" to="/services" />
+              <StyledTab label="The Revolution" to="/revolution" />
+              <StyledTab label="About Us" to="/about" />
+              <StyledTab label="Contact Us" to="/contact" />
             </Tabs>
             <Button
               sx={headerStyles.button}
               variant="contained"
               color="secondary"
+              component={Link}
+              to="/estimate"
             >
               Free Estimate
             </Button>
