@@ -15,7 +15,8 @@ import {
   MenuItem,
 } from "@mui/material";
 
-import logo from "../../assets/logo.svg";
+// import logo from "../../assets/logo.svg";
+import { ReactComponent as Logo } from "../../assets/logo.svg";
 
 // theme
 import theme from "./theme";
@@ -24,15 +25,14 @@ import theme from "./theme";
 const headerStyles = {
   toolbarMargin: {
     ...theme.mixins.toolbar,
-    marginBottom: "3em",
+    marginBottom: "4em",
   },
   logo: {
-    height: "8em",
-    [theme.breakpoints.down("md")]: {
-      height: "7em",
-    },
+    height: "7em",
+    textTransform: "none",
   },
   logoContainer: {
+    height: "7em",
     padding: 0,
     "&:hover": {
       backgroundColor: "transparent",
@@ -58,6 +58,10 @@ const StyledTab = styled((props) => <Tab component={Link} {...props} />)(
     marginLeft: "25px",
   })
 );
+
+const StyledLogo = styled(Logo)(({ theme }) => ({
+  ...headerStyles.logo,
+}));
 
 // functions
 function ElevationScroll(props) {
@@ -113,15 +117,14 @@ const Header = () => {
         {/* Default position of "fixed" */}
         <AppBar position="fixed">
           <Toolbar disableGutters>
-            <Button
+            <Box
               sx={headerStyles.logoContainer}
-              disableRipple
               component={Link}
               to="/"
               onClick={() => setValue(0)}
             >
-              <img sx={headerStyles.logo} alt="company logo" src={logo} />
-            </Button>
+              <StyledLogo />
+            </Box>
 
             <Tabs
               sx={{ ...headerStyles.tabContainer }}
