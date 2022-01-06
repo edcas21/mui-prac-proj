@@ -49,6 +49,11 @@ const headerStyles = {
     height: "45px",
     color: "white",
   },
+  menu: {
+    backgroundColor: theme.palette.common.blue,
+    color: "white",
+    borderRadius: "0px",
+  },
 };
 
 const StyledTab = styled((props) => <Tab component={Link} {...props} />)(
@@ -58,6 +63,16 @@ const StyledTab = styled((props) => <Tab component={Link} {...props} />)(
     marginLeft: "25px",
   })
 );
+
+const StyledMenuItem = styled((props) => (
+  <MenuItem component={Link} {...props} />
+))({
+  ...theme.typography.tab,
+  opacity: 0.7,
+  "&:hover": {
+    opacity: 1,
+  },
+});
 
 const StyledLogo = styled(Logo)(({ theme }) => ({
   ...headerStyles.logo,
@@ -79,10 +94,36 @@ function ElevationScroll(props) {
 
 const Header = () => {
   const [value, setValue] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleChange = (e, value) => {
     setValue(value);
   };
+
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+    setOpen(true);
+  };
+
+  const handleMenuItemClick = (e, i) => {
+    setAnchorEl(null);
+    setOpen(false);
+    setSelectedIndex(i);
+  };
+
+  const handleClose = (e) => {
+    setAnchorEl(null);
+    setOpen(false);
+  };
+
+  const menuOptions = [
+    { name: "Services", link: "/services" },
+    { name: "Custom Software Development", link: "/customsoftware" },
+    { name: "Mobile App Development", link: "/mobile" },
+    { name: "Website Development", link: "/websites" },
+  ];
 
   useEffect(() => {
     console.log(value);
@@ -92,7 +133,28 @@ const Header = () => {
         if (value !== 0) setValue(0);
         break;
       case "/services":
-        if (value !== 1) setValue(1);
+        if (value !== 1) {
+          setValue(1);
+          setSelectedIndex(0);
+        }
+        break;
+      case "/customsoftware":
+        if (value !== 1) {
+          setValue(1);
+          setSelectedIndex(1);
+        }
+        break;
+      case "/mobile":
+        if (value !== 1) {
+          setValue(1);
+          setSelectedIndex(2);
+        }
+        break;
+      case "/websites":
+        if (value !== 1) {
+          setValue(1);
+          setSelectedIndex(3);
+        }
         break;
       case "/revolution":
         if (value !== 2) setValue(2);
@@ -133,7 +195,13 @@ const Header = () => {
             >
               {/* <StyledTab label="Home" /> */}
               <StyledTab label="Home" to="/" />
-              <StyledTab label="Services" to="/services" />
+              <StyledTab
+                aria-owns={anchorEl ? "simple-menu" : undefined}
+                aria-haspopup={anchorEl ? "true" : undefined}
+                onMouseOver={(event) => handleClick(event)}
+                label="Services"
+                to="/services"
+              />
               <StyledTab label="The Revolution" to="/revolution" />
               <StyledTab label="About Us" to="/about" />
               <StyledTab label="Contact Us" to="/contact" />
@@ -147,6 +215,33 @@ const Header = () => {
             >
               Free Estimate
             </Button>
+            {/* Menu */}
+            <Menu
+              sx={{
+                "& .MuiMenu-paper": headerStyles.menu,
+              }}
+              id="simple-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{ onMouseLeave: handleClose }}
+              elevation={0}
+            >
+              {menuOptions.map((option, index) => (
+                <StyledMenuItem
+                  key={option}
+                  to={option.link}
+                  onClick={(event) => {
+                    handleMenuItemClick(event, index);
+                    handleClose();
+                    setValue(1);
+                  }}
+                  selected={index === selectedIndex && value === 1}
+                >
+                  {option.name}
+                </StyledMenuItem>
+              ))}
+            </Menu>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
