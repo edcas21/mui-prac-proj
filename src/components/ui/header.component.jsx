@@ -13,6 +13,7 @@ import {
   Button,
   Menu,
   MenuItem,
+  useMediaQuery, // media queries
 } from "@mui/material";
 
 // import logo from "../../assets/logo.svg";
@@ -22,6 +23,7 @@ import { ReactComponent as Logo } from "../../assets/logo.svg";
 import theme from "./theme";
 
 // styling
+// Note: When using styling objects if you need to make customizations with values provided by the theme, then you need to make sure to import it at the top of the file. 
 const headerStyles = {
   toolbarMargin: {
     ...theme.mixins.toolbar,
@@ -30,12 +32,21 @@ const headerStyles = {
   logo: {
     height: "7em",
     textTransform: "none",
+    [theme.breakpoints.down('md')]: {
+      height: "6em",
+    },
+    [theme.breakpoints.down('xs')]: {
+      height: "5.5em",
+    },
   },
   logoContainer: {
     height: "7em",
     padding: 0,
     "&:hover": {
       backgroundColor: "transparent",
+    },
+    [theme.breakpoints.down('md')]: {
+      height: "6em",
     },
   },
   tabContainer: {
@@ -93,11 +104,15 @@ function ElevationScroll(props) {
 }
 
 const Header = () => {
+  const matches = useMediaQuery(theme.breakpoints.down("md"));
+
+  // state variables
   const [value, setValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // handle event functions
   const handleChange = (e, value) => {
     setValue(value);
   };
@@ -173,6 +188,66 @@ const Header = () => {
     }
   }, [value]); // only run if value is updated
 
+  // Storing a JSX expression in a variable
+  const tabs = (
+    <>
+      <Tabs
+        sx={{ ...headerStyles.tabContainer }}
+        onChange={handleChange}
+        value={value}
+      >
+        {/* <StyledTab label="Home" /> */}
+        <StyledTab label="Home" to="/" />
+        <StyledTab
+          aria-owns={anchorEl ? "simple-menu" : undefined}
+          aria-haspopup={anchorEl ? "true" : undefined}
+          onMouseOver={(event) => handleClick(event)}
+          label="Services"
+          to="/services"
+        />
+        <StyledTab label="The Revolution" to="/revolution" />
+        <StyledTab label="About Us" to="/about" />
+        <StyledTab label="Contact Us" to="/contact" />
+      </Tabs>
+      <Button
+        sx={headerStyles.button}
+        variant="contained"
+        color="secondary"
+        component={Link}
+        to="/estimate"
+      >
+        Free Estimate
+      </Button>
+      {/* Menu */}
+      <Menu
+        sx={{
+          "& .MuiMenu-paper": headerStyles.menu,
+        }}
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{ onMouseLeave: handleClose }}
+        elevation={0}
+      >
+        {menuOptions.map((option, index) => (
+          <StyledMenuItem
+            key={option}
+            to={option.link}
+            onClick={(event) => {
+              handleMenuItemClick(event, index);
+              handleClose();
+              setValue(1);
+            }}
+            selected={index === selectedIndex && value === 1}
+          >
+            {option.name}
+          </StyledMenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+
   return (
     <>
       <ElevationScroll>
@@ -187,61 +262,7 @@ const Header = () => {
             >
               <StyledLogo />
             </Box>
-
-            <Tabs
-              sx={{ ...headerStyles.tabContainer }}
-              onChange={handleChange}
-              value={value}
-            >
-              {/* <StyledTab label="Home" /> */}
-              <StyledTab label="Home" to="/" />
-              <StyledTab
-                aria-owns={anchorEl ? "simple-menu" : undefined}
-                aria-haspopup={anchorEl ? "true" : undefined}
-                onMouseOver={(event) => handleClick(event)}
-                label="Services"
-                to="/services"
-              />
-              <StyledTab label="The Revolution" to="/revolution" />
-              <StyledTab label="About Us" to="/about" />
-              <StyledTab label="Contact Us" to="/contact" />
-            </Tabs>
-            <Button
-              sx={headerStyles.button}
-              variant="contained"
-              color="secondary"
-              component={Link}
-              to="/estimate"
-            >
-              Free Estimate
-            </Button>
-            {/* Menu */}
-            <Menu
-              sx={{
-                "& .MuiMenu-paper": headerStyles.menu,
-              }}
-              id="simple-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              MenuListProps={{ onMouseLeave: handleClose }}
-              elevation={0}
-            >
-              {menuOptions.map((option, index) => (
-                <StyledMenuItem
-                  key={option}
-                  to={option.link}
-                  onClick={(event) => {
-                    handleMenuItemClick(event, index);
-                    handleClose();
-                    setValue(1);
-                  }}
-                  selected={index === selectedIndex && value === 1}
-                >
-                  {option.name}
-                </StyledMenuItem>
-              ))}
-            </Menu>
+            {matches ? null : tabs}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
